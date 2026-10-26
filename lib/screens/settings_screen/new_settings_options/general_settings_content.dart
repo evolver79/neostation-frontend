@@ -77,7 +77,7 @@ class GeneralSettingsContentState extends State<GeneralSettingsContent>
 
     // Pre-allocate keys for maximum theoretical setting items (the fixed rows
     // plus one per navigation tab that can be toggled).
-    for (int i = 0; i < 18 + NavTab.values.length; i++) {
+    for (int i = 0; i < 19 + NavTab.values.length; i++) {
       _itemKeys.add(GlobalKey());
     }
   }
@@ -208,6 +208,7 @@ class GeneralSettingsContentState extends State<GeneralSettingsContent>
     count++; // Custom sounds
     count++; // 12-Hour Clock
     count++; // Ignore leading articles in game sorting
+    count++; // Video previews
     count++; // Show subfolders (every system)
     count++; // Cloud-save mark in the game views
     count++; // Achievement badges on game tiles
@@ -387,6 +388,13 @@ class GeneralSettingsContentState extends State<GeneralSettingsContent>
       configProvider.updateIgnoreArticlesInGameSort(
         !configProvider.config.ignoreArticlesInGameSort,
       );
+      return;
+    }
+    currentItemIndex++;
+
+    // Protocol: Play preview videos.
+    if (index == currentItemIndex) {
+      configProvider.updateVideoPreviews(!configProvider.config.videoPreviews);
       return;
     }
     currentItemIndex++;
@@ -795,6 +803,30 @@ class GeneralSettingsContentState extends State<GeneralSettingsContent>
                       onChanged: (value) => context
                           .read<SqliteConfigProvider>()
                           .updateIgnoreArticlesInGameSort(value),
+                      activeColor: theme.colorScheme.primary,
+                    ),
+                  );
+                }(),
+
+                // Setting: Play preview videos.
+                SizedBox(height: 12.r),
+                () {
+                  final index = currentItemIdx++;
+                  return SettingRow(
+                    key: _itemKeys[index],
+                    onTap: () => selectItem(index),
+                    focused:
+                        widget.isContentFocused &&
+                        widget.selectedContentIndex == index,
+                    title: AppLocale.videoPreviews.getString(context),
+                    subtitle: AppLocale.videoPreviewsSubtitle.getString(
+                      context,
+                    ),
+                    trailing: CustomToggleSwitch(
+                      value: config.videoPreviews,
+                      onChanged: (value) => context
+                          .read<SqliteConfigProvider>()
+                          .updateVideoPreviews(value),
                       activeColor: theme.colorScheme.primary,
                     ),
                   );

@@ -389,6 +389,8 @@ extension _SecondaryDisplay on _SystemGamesListState {
   void _startVideoTimer() {
     _videoTimer?.cancel();
     if (!mounted || _isGameLaunching) return;
+    // Off: no player is ever created, on either screen.
+    if (!context.read<SqliteConfigProvider>().config.videoPreviews) return;
 
     _videoTimer = Timer(_SystemGamesListState._videoDelay, () async {
       if (!mounted) return;

@@ -659,6 +659,9 @@ class SqliteMigrations {
       case 175:
         await _migrateToVersion175(db);
         break;
+      case 176:
+        await _migrateToVersion176(db);
+        break;
       default:
         _log.w('No migration defined for version $version');
     }
@@ -7215,6 +7218,22 @@ class SqliteMigrations {
       _log.e('Error in migration v163: $e');
       _log.e('   StackTrace: $stackTrace');
       rethrow;
+    }
+  }
+
+  /// Migration v176: persists whether game previews play their video.
+  /// Existing installs keep playing them. Above main's v175 and the slots
+  /// open PRs hold (v171 Android Games, v173 favourites, v174 second-screen
+  /// logo).
+  static Future<void> _migrateToVersion176(Database db) async {
+    final columns = db
+        .select('PRAGMA table_info(user_config)')
+        .map((row) => row['name'].toString())
+        .toSet();
+    if (!columns.contains('video_previews')) {
+      db.execute(
+        'ALTER TABLE user_config ADD COLUMN video_previews INTEGER DEFAULT 1',
+      );
     }
   }
 
